@@ -1,14 +1,17 @@
-job_defaults: &job_defaults
+job_defaults:
+  &job_defaults
   resource_class: xlarge
 
 # job_node_environment will setup the environment for any job being executed.
-job_node_environment: &job_node_environment
+job_node_environment:
+  &job_node_environment
   NODE_ENV: "test"
   WEBPACK_MAX_CORES: "4"
   NODE_OPTIONS: "--max-old-space-size=8192"
 
 # job_node_defaults applies all the defaults for each job.
-job_node_defaults: &job_node_defaults
+job_node_defaults:
+  &job_node_defaults
   <<: *job_defaults
   working_directory: ~/coralproject/talk
   docker:
@@ -16,9 +19,10 @@ job_node_defaults: &job_node_defaults
   environment:
     <<: *job_node_environment
 
-setup_remote_docker_defaults: &setup_remote_docker_defaults
+setup_remote_docker_defaults:
   # This is pinned to 19 to resolve a problem described here:
   # https://discuss.circleci.com/t/docker-build-fails-with-nonsensical-eperm-operation-not-permitted-copyfile/37364/24
+  &setup_remote_docker_defaults
   version: 19.03.13
   docker_layer_caching: true
 
@@ -107,7 +111,8 @@ jobs:
           name: Perform testing
           # We're running these tests in band to avoid errors where the circleci
           # test runner runs out of RAM trying to run them all in parallel.
-          command: npm run test -- --ci --runInBand --reporters=default --reporters=jest-junit
+          command: npm run test -- --ci --runInBand --reporters=default
+            --reporters=jest-junit
       - store_test_results:
           path: reports/junit
       - store_artifacts:
@@ -138,6 +143,8 @@ jobs:
           root: .
           paths:
             - dist
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
 
   # upload static assets to cdn.
   upload_static:
@@ -216,7 +223,7 @@ jobs:
             gcloud --quiet config set project "${GOOGLE_PROJECT_ID}"
             gcloud --quiet config set compute/zone "${GOOGLE_COMPUTE_ZONE}"
             gcloud auth configure-docker --quiet
-      - run: 
+      - run:
           name: Create and push the image to GCR
           command: bash ./scripts/docker.sh deploy-commit
           no_output_timeout: 30m
@@ -244,7 +251,8 @@ jobs:
 
 # filter_release will add the filters for a deploy job in a workflow to make it
 # only execute on a deploy related job.
-filter_release: &filter_release
+filter_release:
+  &filter_release
   filters:
     branches:
       only:
@@ -254,7 +262,8 @@ filter_release: &filter_release
 
 # filter_tagged_release will add the filters for a deploy job in a workflow to
 # make it only execute on a tagged release.
-filter_tagged_release: &filter_tagged_release
+filter_tagged_release:
+  &filter_tagged_release
   filters:
     branches:
       ignore: /.*/
@@ -262,7 +271,8 @@ filter_tagged_release: &filter_tagged_release
       only: /^v.*/
 
 # filter_develop will add the filters for a development related commit.
-filter_develop: &filter_develop
+filter_develop:
+  &filter_develop
   filters:
     branches:
       ignore:
