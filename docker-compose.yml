@@ -1,0 +1,22 @@
+version: "2"
+services:
+  talk:
+    image: coralproject/talk:6
+    restart: always
+    ports:
+      - "127.0.0.1:5000:5000"
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      - MONGODB_URI=mongodb+srv://adriano:asdfg123@cluster1.v29hhtm.mongodb.net/?retryWrites=true&w=majority
+      - REDIS_URI=redis-10970.c293.eu-central-1-1.ec2.cloud.redislabs.com:10970
+      - SIGNING_SECRET=vf1YxYDSnFe9iT1y8tL0FqYAsbxkkWwplkgOaCw5IayS+kpPEmOqpb5PJ/TlFnv0
+  mongo:
+    image: mongo:4.2
+    volumes:
+      - ./data/mongo:/data/db
+  redis:
+    image: redis:3.2
+    volumes:
+      - ./data/redis:/data
